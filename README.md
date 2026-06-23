@@ -1,179 +1,211 @@
-Gallery · Secure Media Gallery
+```markdown
+<p align="center">
+  <img src="https://res.cloudinary.com/dfzrb3fac/image/upload/v1782188114/file_000000001cfc71fabf84b73eaa639faf_cpygth.png" alt="Gallery Logo" width="120" />
+</p>
 
-A full‑stack, password‑protected media gallery with drag‑and‑drop uploads, Cloudinary storage, and a responsive dark‑theme UI. Built with Flask (backend) and vanilla HTML/CSS/JavaScript (frontend).
+<h1 align="center">Gallery · Secure Media Vault</h1>
 
-https://via.placeholder.com/800x450?text=Gallery+Screenshot
-Replace with actual screenshot
+<p align="center">
+  <b>A sleek, password-protected media gallery with Cloudinary integration.</b><br/>
+  Upload, organize, and preview images & videos in a beautifully crafted dark-mode interface.
+</p>
 
----
-
-Table of Contents
-
-· Features
-· Tech Stack
-· Project Structure
-· Installation & Setup
-  · Prerequisites
-  · Configuration
-  · Running the Application
-· API Reference
-· Usage
-· Deployment
-· License
+<p align="center">
+  <a href="#features">Features</a> ·
+  <a href="#tech-stack">Tech Stack</a> ·
+  <a href="#getting-started">Getting Started</a> ·
+  <a href="#configuration">Configuration</a> ·
+  <a href="#api-reference">API</a> ·
+  <a href="#license">License</a>
+</p>
 
 ---
 
-Features
+## Features
 
-· Password‑protected access – single‑key entry to keep your gallery private.
-· Upload media – drag‑and‑drop or click‑to‑select for images and videos.
-· Cloudinary integration – media stored in the cloud with automatic optimisation.
-· Lightbox viewer – browse full‑size images and videos with keyboard navigation.
-· Long‑press delete – on mobile or desktop, long‑press a thumbnail to reveal a delete button.
-· Responsive grid – switch between standard and compact views.
-· Real‑time feedback – upload progress indicators and toast notifications.
-· Persistent storage – local JSON database keeps track of your media metadata.
-
----
-
-Tech Stack
-
-Layer Technologies
-Frontend HTML5, CSS3, Vanilla JavaScript (ES6)
-Backend Python 3, Flask
-Storage Cloudinary (CDN + media hosting)
-Database JSON file (local)
-Other Flask‑CORS, Fonts (Inter, JetBrains Mono)
+| Feature | Description |
+|---------|-------------|
+| **Secure Access** | Password-protected entry with server-side verification |
+| **Dual Media Support** | Upload and preview both images (JPG, PNG, GIF, WebP) and videos (MP4, WebM, MOV) |
+| **Cloudinary Integration** | Automatic cloud storage, transformation-ready URLs, and CDN delivery |
+| **Drag & Drop Upload** | Intuitive file queue with real-time progress and validation |
+| **Immersive Lightbox** | Full-screen media viewer with keyboard navigation (← → Esc) |
+| **Long-Press Delete** | Touch-friendly deletion with haptic feedback and confirmation modal |
+| **Responsive Grid** | Toggle between Grid and Compact layouts; optimized for all screen sizes |
+| **Dark-First Design** | Polished dark UI with glassmorphism, subtle animations, and premium typography |
+| **Local Persistence** | Lightweight JSON database for fast metadata retrieval |
 
 ---
 
-Project Structure
+## Tech Stack
+
+**Backend**
+- Python 3.9+
+- Flask — lightweight WSGI web framework
+- Cloudinary Python SDK — media upload, storage, and deletion
+- Flask-CORS — cross-origin resource sharing
+
+**Frontend**
+- Vanilla JavaScript (ES6+) — zero build step
+- Custom CSS3 — CSS variables, grid, flexbox, backdrop-filter
+- Google Fonts (Inter + JetBrains Mono)
+
+**Infrastructure**
+- Cloudinary — cloud media management & CDN
+- JSON file-based database (`media.json`)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.9 or higher
+- A [Cloudinary](https://cloudinary.com) account (free tier available)
+
+### Installation
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/gallery-vault.git
+cd gallery-vault
+
+# 2. Create a virtual environment
+python -m venv venv
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install flask flask-cors cloudinary
+
+# 4. Configure your credentials (see Configuration below)
+# Edit app.py and replace the placeholder Cloudinary credentials
+
+# 5. Run the application
+python app.py
+```
+
+The server will start on `http://localhost:5000`.
+
+---
+
+## Configuration
+
+All critical settings are centralized at the top of `app.py`:
+
+```python
+# Security
+PASSWORD = "password"           # <-- Change this to your secure access key
+
+# Cloudinary Credentials
+cloudinary.config(
+    cloud_name="your_cloud_name",   # <-- Your Cloudinary cloud name
+    api_key="your_api_key",         # <-- Your API key
+    api_secret="your_api_secret"    # <-- Your API secret
+)
+```
+
+### Upload Limits
+
+| Media Type | Max Size | Supported Formats |
+|------------|----------|-------------------|
+| Images     | 20 MB    | JPEG, PNG, WebP, GIF |
+| Videos     | 100 MB   | MP4, WebM, MOV, OGG |
+
+---
+
+## Project Structure
 
 ```
-.
-├── gallery1.html          # Frontend (single‑page application)
-├── app.py                 # Flask backend
-├── media.json             # Local database (created automatically)
-├── requirements.txt       # Python dependencies
-└── README.md              # This file
+gallery-vault/
+├── app.py              # Flask backend — API routes, Cloudinary logic, DB helpers
+├── index.html          # Single-page frontend — UI, interactions, upload queue
+├── media.json          # Auto-generated local database (created on first run)
+├── requirements.txt    # Python dependencies
+└── README.md           # This file
 ```
 
 ---
 
-Installation & Setup
+## API Reference
 
-Prerequisites
+### Authentication
 
-· Python 3.8+ and pip
-· A Cloudinary account (free tier works)
-· (Optional) git for cloning
+| Method | Endpoint | Body | Response |
+|--------|----------|------|----------|
+| `POST` | `/verify-password` | `{ "password": "..." }` | `{ "success": true/false }` |
 
-Configuration
+### Media Management
 
-1. Clone or download this repository.
-2. Install Python dependencies:
-   ```bash
-   pip install flask flask-cors cloudinary
-   ```
-   (Or use requirements.txt if provided.)
-3. Set up Cloudinary credentials in app.py:
-   ```python
-   cloudinary.config(
-       cloud_name="your_cloud_name",
-       api_key="your_api_key",
-       api_secret="your_api_secret"
-   )
-   ```
-4. Change the gallery password (optional):
-   In app.py, update PASSWORD = "killme" to your own secret.
-5. Place a logo image (optional):
-      If you want to display a logo in the navbar, add an logo.png file in the project root and update the HTML to reference it (or keep the existing brand‑mark icon).
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/api/images` | Retrieve all media items |
+| `POST` | `/api/upload` | Upload a file (multipart/form-data) |
+| `POST` | `/api/delete` | Delete a media item by `public_id` or `url` |
+| `GET`  | `/api/health` | Health check |
 
-Running the Application
-
-1. Start the Flask server:
-   ```bash
-   python app.py
-   ```
-   The server will run on http://0.0.0.0:5000 by default.
-2. Open your browser and go to http://localhost:5000.
-      You will be prompted for the password you set in step 4.
-
----
-
-API Reference
-
-All endpoints are prefixed with /api.
-
-Method Endpoint Description
-POST /verify-password Check if provided password matches
-GET /api/images Retrieve all media items
-POST /api/upload Upload a file (multipart/form‑data)
-POST /api/delete Delete a media item (by public_id or URL)
-GET /api/health Health check
-
-Example response from /api/images:
+### Upload Response
 
 ```json
 {
-  "images": [
-    {
-      "url": "https://res.cloudinary.com/...",
-      "public_id": "gallery/abc123",
-      "resource_type": "image",
-      "type": "image",
-      "name": "photo.jpg",
-      "duration": null,
-      "format": "jpg"
-    }
-  ]
+  "success": true,
+  "url": "https://res.cloudinary.com/.../image/upload/...",
+  "type": "image",
+  "public_id": "gallery/abc123"
 }
 ```
 
 ---
 
-Usage
+## User Interface
 
-1. Password entry – enter the access key on the overlay to unlock the gallery.
-2. Viewing – click any thumbnail to open the lightbox. Use arrow keys or on‑screen buttons to navigate.
-3. Upload – click the Upload button (top‑right) or drag files onto the drop zone.
-4. Delete – on a thumbnail, press and hold (or long‑click) for ~600ms until the delete button appears.
-      Alternatively, delete from the lightbox using the trash icon.
-5. Change view – toggle between Grid and Compact layouts using the segmented control above the gallery.
+### Password Gate
+A frosted-glass overlay secures the gallery. Enter your access key to unlock.
+
+### Gallery Grid
+- **Grid View** — Spacious tiles with hover lift and scale effects
+- **Compact View** — Dense layout for quick browsing
+- **Shimmer Loading** — Skeleton placeholders while fetching
+
+### Media Lightbox
+- Keyboard shortcuts: `←` previous, `→` next, `Esc` close
+- Video autoplay with native controls
+- One-click deletion with confirmation
+
+### Upload Queue
+- Drag & drop or click to select files
+- Per-file validation (type, size)
+- Real-time progress indicators
+- Batch upload with individual status tracking
 
 ---
 
-Deployment
+## Security Notes
 
-For production use, consider:
+- **Password** is stored in plain text in `app.py` for simplicity. For production, migrate to environment variables or a hashed credential store.
+- **CORS** is enabled globally (`CORS(app)`). Restrict origins in production.
+- **File validation** occurs on both client and server sides.
+- **Cloudinary `invalidate=True`** ensures deleted assets are purged from CDN caches.
 
-· Using a production WSGI server like Gunicorn or uWSGI.
-· Setting a strong, environment‑based password (do not hard‑code).
-· Using environment variables for Cloudinary credentials.
-· Replacing the JSON file with a proper database (SQLite/PostgreSQL) for concurrent access.
-· Enabling HTTPS and adding proper CORS policies.
+---
 
-Example with Gunicorn:
+## Roadmap
 
-```bash
-gunicorn app:app --bind 0.0.0.0:8000
+- [ ] Environment variable configuration (`.env` support)
+- [ ] User accounts & multi-gallery support
+- [ ] Album / folder organization
+- [ ] Search & filter by media type
+- [ ] Infinite scroll pagination
+- [ ] PWA support for offline viewing
+
+---
+
+## License
+
+MIT License — feel free to use, modify, and distribute.
+
+---
+
+<p align="center">
+  <sub>Crafted with precision. Built for creators.</sub>
+</p>
 ```
-
----
-
-License
-
-This project is open‑source and available under the MIT License.
-Feel free to adapt it for your own use.
-
----
-
-Acknowledgements
-
-· Cloudinary for media hosting and transformation.
-· Inter and JetBrains Mono fonts.
-· Icons from Feather Icons.
-
----
-
-Happy sharing! 📷🎬

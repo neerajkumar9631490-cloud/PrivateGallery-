@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Gallery · Secure Access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================
+       RESET & BASE
+       ============================================ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #131316;
+      --surface-2: #1a1a1d;
+      --surface-3: #232327;
+      --surface-hover: #1f1f23;
+
+      --border: #232328;
+      --border-strong: #2e2e34;
+      --border-focus: #4a4a52;
+
+      --text: #fafafa;
+      --text-2: #a1a1aa;
+      --text-3: #71717a;
+      --text-4: #52525b;
+
+      --accent: #fafafa;
+      --accent-soft: rgba(250, 250, 250, 0.06);
+      --accent-border: rgba(250, 250, 250, 0.12);
+
+      --danger: #ef4444;
+      --danger-soft: rgba(239, 68, 68, 0.08);
+      --danger-border: rgba(239, 68, 68, 0.3);
+      --danger-bg: rgba(239, 68, 68, 0.12);
+
+      --radius-sm: 6px;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.6);
+
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+      --header-h: 64px;
+      --container: 1400px;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      letter-spacing: -0.005em;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: "tnum" 1, "ss01" 1; }
+
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 10px; border: 2px solid var(--bg); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-focus); }
+
+    /* ============================================
+       PASSWORD OVERLAY
+       ============================================ */
+    .password-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 11, 0.92);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s var(--ease);
+    }
+
+    .password-overlay.hide { opacity: 0; pointer-events: none; }
+
+    .password-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: 48px 40px;
+      width: 92%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .password-card .lock-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+    }
+
+    .password-card h1 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .password-card .subtitle {
+      color: var(--text-2);
+      font-size: 14px;
+      margin-bottom: 32px;
+    }
+
+    .field { position: relative; margin-bottom: 16px; text-align: left; }
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      letter-spacing: 0.01em;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.1em;
+      transition: border-color 0.15s var(--ease-in-out), background 0.15s var(--ease-in-out);
+    }
+
+    .password-input::placeholder { letter-spacing: 0.1em; color: var(--text-4); }
+    .password-input:hover { border-color: var(--border-strong); }
+    .password-input:focus { outline: none; border-color: var(--border-focus); background: var(--surface); }
+
+    .password-btn {
+      width: 100%;
+      padding: 11px 16px;
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      color: #0a0a0b;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s var(--ease-in-out), transform 0.05s var(--ease-in-out);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .password-btn:hover { opacity: 0.9; }
+    .password-btn:active { transform: scale(0.99); }
+    .password-btn svg { width: 14px; height: 14px; }
+
+    /* ============================================
+       APP CONTAINER
+       ============================================ */
+    .app-content { opacity: 0; visibility: hidden; transition: opacity 0.5s var(--ease); }
+    .app-content.visible { opacity: 1; visibility: visible; }
+
+    /* ============================================
+       NAVBAR
+       ============================================ */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-h);
+      background: rgba(10, 10, 11, 0.7);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .navbar-inner {
+      max-width: var(--container);
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand { display: flex; align-items: center; gap: 12px; }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2a2a2e 0%, #18181b 100%);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+
+    .brand-mark svg { width: 14px; height: 14px; }
+
+    .nav-title { font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+
+    .nav-divider { width: 1px; height: 18px; background: var(--border); }
+
+    .nav-meta { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-2); }
+    .nav-meta .count { color: var(--text); font-weight: 500; }
+
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s var(--ease-in-out), color 0.15s var(--ease-in-out), border-color 0.15s var(--ease-in-out);
+    }
+
+    .icon-btn:hover { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .icon-btn svg { width: 16px; height: 16px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 36px;
+      padding: 0 14px;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s var(--ease-in-out), border-color 0.15s var(--ease-in-out), opacity 0.15s var(--ease-in-out), transform 0.05s var(--ease-in-out);
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn svg { width: 14px; height: 14px; }
+    .btn-primary { background: var(--accent); color: #0a0a0b; border-color: var(--accent); }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover { background: var(--surface-hover); border-color: var(--border-strong); }
+    .btn-ghost { background: transparent; color: var(--text-2); }
+    .btn-ghost:hover { background: var(--surface); color: var(--text); }
+    .btn-danger { background: var(--danger); color: white; border-color: var(--danger); }
+    .btn-danger:hover { background: #dc2626; border-color: #dc2626; }
+    .btn-danger-ghost { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+    .btn-danger-ghost:hover { background: var(--danger); color: white; border-color: var(--danger); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ============================================
+       LAYOUT
+       ============================================ */
+    .page { padding-top: calc(var(--header-h) + 24px); padding-bottom: 80px; min-height: 100vh; }
+    .container { max-width: var(--container); margin: 0 auto; padding: 0 24px; }
+
+    .subheader {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 8px 0 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .subheader-text h2 {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .subheader-text p { font-size: 13px; color: var(--text-2); }
+    .subheader-actions { display: flex; align-items: center; gap: 8px; }
+
+    .segmented {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3px;
+    }
+
+    .segmented button {
+      padding: 5px 10px;
+      background: transparent;
+      border: none;
+      color: var(--text-2);
+      font-size: 12px;
+      font-weight: 500;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.15s var(--ease-in-out), color 0.15s var(--ease-in-out);
+    }
+
+    .segmented button.active { background: var(--surface-3); color: var(--text); }
+    .segmented button:hover:not(.active) { color: var(--text); }
+
+    /* ============================================
+       GALLERY GRID — fixed toggle (CSS classes)
+       ============================================ */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .gallery-grid.compact {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 6px;
+    }
+
+    .gallery-item {
+      position: relative;
+      aspect-ratio: 1;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: transform 0.3s var(--ease), border-color 0.2s var(--ease-in-out), box-shadow 0.3s var(--ease);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .gallery-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .gallery-item:active { transform: scale(0.98); }
+
+    .gallery-item.pressing {
+      transform: scale(0.96);
+      border-color: var(--danger);
+      box-shadow: 0 0 0 2px var(--danger-border), var(--shadow);
+    }
+
+    .gallery-item.long-pressing {
+      transform: scale(0.94);
+      border-color: var(--danger);
+      box-shadow: 0 0 0 2px var(--danger), var(--shadow);
+    }
+
+    .gallery-item.long-pressing .delete-overlay { opacity: 1; pointer-events: auto; }
+    .gallery-item.long-pressing .delete-overlay .delete-btn { transform: scale(1); }
+
+    .gallery-item .media {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s var(--ease), filter 0.3s var(--ease-in-out);
+      pointer-events: none;
+    }
+
+    .gallery-item:hover .media { transform: scale(1.04); }
+
+    /* Video tile indicator */
+    .video-indicator {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 28px;
+      height: 28px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .video-indicator svg { width: 12px; height: 12px; }
+
+    .video-duration {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      color: white;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Delete overlay (revealed on long press) */
+    .delete-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.65) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s var(--ease-in-out);
+      z-index: 5;
+    }
+
+    .delete-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--danger);
+      border: none;
+      border-radius: 100px;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transform: scale(0.7);
+      transition: transform 0.25s var(--ease), background 0.15s var(--ease-in-out);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .delete-btn:hover { background: #dc2626; }
+    .delete-btn svg { width: 13px; height: 13px; }
+
+    /* Long-press progress indicator */
+    .press-progress {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 3;
+    }
+
+    .gallery-item.pressing .press-progress { opacity: 1; }
+    .gallery-item.long-pressing .press-progress { opacity: 0; }
+
+    /* Shimmer */
+    .shimmer-item {
+      aspect-ratio: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .shimmer-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--surface) 0%, var(--surface-2) 50%, var(--surface) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.8s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      padding: 80px 32px;
+      text-align: center;
+      background: var(--surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+    }
+
+    .empty-state .empty-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 20px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-3);
+    }
+
+    .empty-state .empty-icon svg { width: 22px; height: 22px; }
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .empty-state p {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: 20px;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ============================================
+       IMAGE / VIDEO LIGHTBOX
+       ============================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.94);
+      backdrop-filter: blur(20px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s var(--ease), visibility 0.3s var(--ease);
+    }
+
+    .modal-backdrop.open { opacity: 1; visibility: visible; }
+
+    .modal-stage {
+      position: relative;
+      max-width: 92vw;
+      max-height: 86vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-media-wrap {
+      max-width: 92vw;
+      max-height: 86vh;
+      position: relative;
+    }
+
+    .modal-media-wrap img,
+    .modal-media-wrap video {
+      max-width: 100%;
+      max-height: 86vh;
+      object-fit: contain;
+      border-radius: var(--radius);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+      display: block;
+    }
+
+    .modal-media-wrap video {
+      background: #000;
+    }
+
+    .modal-control {
+      position: fixed;
+      background: rgba(20, 20, 22, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s var(--ease-in-out), opacity 0.15s var(--ease-in-out);
+    }
+
+    .modal-control:hover { background: rgba(40, 40, 44, 0.9); }
+    .modal-control svg { width: 18px; height: 18px; }
+    .modal-close { top: 20px; right: 20px; width: 40px; height: 40px; border-radius: 10px; }
+    .modal-arrow {
+      top: 50%;
+      transform: translateY(-50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+    }
+
+    .modal-arrow.prev { left: 20px; }
+    .modal-arrow.next { right: 20px; }
+
+    .modal-delete {
+      top: 20px;
+      right: 72px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .modal-delete:hover { background: var(--danger); color: white; border-color: var(--danger); }
+
+    .modal-counter {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 22, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-counter .current { color: var(--text); font-weight: 600; }
+    .modal-counter .divider { color: var(--text-4); }
+    .modal-counter .type-badge {
+      padding: 2px 6px;
+      background: var(--surface-3);
+      border-radius: 4px;
+      font-size: 10px;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ============================================
+       UPLOAD MODAL
+       ============================================ */
+    .upload-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 11, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s var(--ease), visibility 0.25s var(--ease);
+      padding: 24px;
+    }
+
+    .upload-modal.open { opacity: 1; visibility: visible; }
+
+    .upload-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 560px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: translateY(8px) scale(0.98);
+      transition: transform 0.25s var(--ease);
+    }
+
+    .upload-modal.open .upload-panel { transform: translateY(0) scale(1); }
+
+    .upload-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .upload-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .upload-header p { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+    .upload-body { padding: 24px; overflow-y: auto; flex: 1; }
+
+    .drop-zone {
+      border: 1.5px dashed var(--border-strong);
+      border-radius: var(--radius);
+      padding: 36px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s var(--ease-in-out), background 0.2s var(--ease-in-out);
+      background: var(--bg);
+    }
+
+    .drop-zone:hover, .drop-zone.dragover { border-color: var(--text-3); background: var(--surface-2); }
+
+    .drop-zone .upload-icon {
+      width: 40px;
+      height: 40px;
+      margin: 0 auto 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-2);
+    }
+
+    .drop-zone .upload-icon svg { width: 18px; height: 18px; }
+    .drop-zone .drop-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .drop-zone .drop-hint { font-size: 12px; color: var(--text-3); }
+
+    .upload-queue { margin-top: 20px; }
+
+    .queue-section-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-3);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .queue-section-label .count { color: var(--text-2); font-family: 'JetBrains Mono', monospace; letter-spacing: 0; }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 6px;
+    }
+
+    .queue-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: var(--surface-2);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-3);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .queue-thumb img,
+    .queue-thumb video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .queue-thumb .play-mini {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+    }
+
+    .queue-thumb .play-mini svg { width: 12px; height: 12px; }
+    .queue-thumb svg { width: 14px; height: 14px; }
+
+    .queue-info { flex: 1; min-width: 0; }
+    .queue-item-name {
+      font-size: 13px;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+
+    .progress-bar { height: 3px; background: var(--surface-2); border-radius: 100px; overflow: hidden; }
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      width: 0%;
+      transition: width 0.3s var(--ease);
+    }
+
+    .queue-item-status {
+      font-size: 11px;
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.02em;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .queue-item-status.ready { color: var(--text-3); }
+    .queue-item-status.uploading { color: var(--text); }
+    .queue-item-status.done { color: var(--text); }
+    .queue-item-status.error { color: var(--danger); }
+    .queue-item-status .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+    .upload-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      background: var(--surface);
+    }
+
+    /* ============================================
+       CONFIRM MODAL (delete)
+       ============================================ */
+    .confirm-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 11, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s var(--ease), visibility 0.2s var(--ease);
+      padding: 24px;
+    }
+
+    .confirm-modal.open { opacity: 1; visibility: visible; }
+
+    .confirm-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.96);
+      transition: transform 0.2s var(--ease);
+    }
+
+    .confirm-modal.open .confirm-panel { transform: scale(1); }
+
+    .confirm-panel .confirm-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--danger);
+      margin-bottom: 16px;
+    }
+
+    .confirm-panel .confirm-icon svg { width: 18px; height: 18px; }
+    .confirm-panel h3 { font-size: 16px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px; }
+    .confirm-panel p { font-size: 13px; color: var(--text-2); margin-bottom: 20px; }
+
+    .confirm-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* ============================================
+       TOAST
+       ============================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--text);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 240px;
+      max-width: 360px;
+      pointer-events: auto;
+      animation: toastIn 0.3s var(--ease);
+    }
+
+    .toast .toast-icon { flex-shrink: 0; color: var(--text-2); }
+    .toast.error { border-color: rgba(239, 68, 68, 0.3); }
+    .toast.error .toast-icon { color: var(--danger); }
+
+    @keyframes toastIn {
+      from { transform: translateY(8px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ============================================
+       FADE-IN
+       ============================================ */
+    .fade-in { animation: fadeIn 0.4s var(--ease) both; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 640px) {
+      :root { --header-h: 56px; }
+      .navbar-inner { padding: 0 16px; }
+      .container { padding: 0 16px; }
+      .subheader { padding: 4px 0 16px; }
+      .subheader-text h2 { font-size: 20px; }
+
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .gallery-grid.compact { grid-template-columns: repeat(3, 1fr); gap: 4px; }
+
+      .modal-arrow { width: 38px; height: 38px; }
+      .modal-arrow.prev { left: 10px; }
+      .modal-arrow.next { right: 10px; }
+      .modal-delete { right: 64px; }
+
+      .upload-panel { max-height: 92vh; }
+      .upload-header, .upload-body, .upload-footer { padding-left: 16px; padding-right: 16px; }
+      .nav-meta .label-text { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============= PASSWORD OVERLAY ============= -->
+<div class="password-overlay" id="passwordOverlay">
+  <div class="password-card fade-in">
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h1>Secure Access</h1>
+    <p class="subtitle">Enter your access key to view the gallery</p>
+    <div class="field">
+      <label for="passwordInput">Access key</label>
+      <input type="password" class="password-input" id="passwordInput" placeholder="••••••••" autofocus>
+    </div>
+    <button class="password-btn" id="submitPassword">
+      Continue
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h14"/>
+        <path d="m12 5 7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- ============= MAIN APP ============= -->
+<div class="app-content" id="appContent">
+
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <div class="nav-brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="3"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <path d="m21 15-5-5L5 21"/>
+          </svg>
+        </div>
+        <span class="nav-title">Gallery</span>
+        <span class="nav-divider"></span>
+        <span class="nav-meta">
+          <span class="count mono" id="imgCount">0</span>
+          <span class="label-text">items</span>
+        </span>
+      </div>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="btnRefresh" title="Refresh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M16 16h5v5"/>
+          </svg>
+        </button>
+        <button class="btn btn-primary" id="btnOpenUpload">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14"/>
+            <path d="M5 12h14"/>
+          </svg>
+          Upload
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="page">
+    <div class="container">
+      <div class="subheader">
+        <div class="subheader-text">
+          <h2>All media</h2>
+          <p id="subText">Loading your collection…</p>
+        </div>
+        <div class="subheader-actions">
+          <div class="segmented" role="tablist">
+            <button class="active" data-view="grid">
+              <svg style="width:12px;height:12px;margin-right:4px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+              </svg>
+              Grid
+            </button>
+            <button data-view="compact">
+              <svg style="width:12px;height:12px;margin-right:4px;vertical-align:-2px" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+                <rect x="3" y="11" width="0.01" height="0.01"/><rect x="11" y="3" width="0.01" height="0.01"/>
+              </svg>
+              Compact
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+        <div class="shimmer-item"><div class="shimmer-inner"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ============= LIGHTBOX ============= -->
+<div class="modal-backdrop" id="imageModal">
+  <div class="modal-stage">
+    <div class="modal-media-wrap" id="modalMediaWrap">
+      <!-- Image or Video injected here -->
+    </div>
+  </div>
+  <button class="modal-control modal-delete" id="modalDelete" aria-label="Delete" title="Delete">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6h18"/>
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      <line x1="10" y1="11" x2="10" y2="17"/>
+      <line x1="14" y1="11" x2="14" y2="17"/>
+    </svg>
+  </button>
+  <button class="modal-control modal-close" id="modalClose" aria-label="Close">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6 6 18"/>
+      <path d="m6 6 12 12"/>
+    </svg>
+  </button>
+  <button class="modal-control modal-arrow prev" id="modalPrev" aria-label="Previous">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+  </button>
+  <button class="modal-control modal-arrow next" id="modalNext" aria-label="Next">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  </button>
+  <div class="modal-counter">
+    <span class="type-badge" id="modalType">IMG</span>
+    <span class="current mono" id="modalCurrent">1</span>
+    <span class="divider">/</span>
+    <span class="mono" id="modalTotal">1</span>
+  </div>
+</div>
+
+<!-- ============= UPLOAD MODAL ============= -->
+<div class="upload-modal" id="uploadModal">
+  <div class="upload-panel">
+    <div class="upload-header">
+      <div>
+        <h2>Upload media</h2>
+        <p>Add new photos and videos to your gallery</p>
+      </div>
+      <button class="icon-btn" id="btnCloseUpload" aria-label="Close" style="margin-left: 12px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18"/>
+          <path d="m6 6 12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="upload-body">
+      <div class="drop-zone" id="dropZone">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <div class="drop-title">Click or drag & drop</div>
+        <div class="drop-hint">JPG, PNG, GIF, WebP, MP4, WebM, MOV — up to 100MB</div>
+        <input type="file" id="fileInput" multiple accept="image/*,video/*" style="display: none;">
+      </div>
+
+      <div class="upload-queue" id="uploadQueue"></div>
+    </div>
+
+    <div class="upload-footer">
+      <button class="btn btn-ghost" id="btnCancelUpload">Cancel</button>
+      <button class="btn btn-primary" id="btnStartUpload" disabled>
+        Upload
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 5v14"/>
+          <path d="M5 12h14"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============= DELETE CONFIRM MODAL ============= -->
+<div class="confirm-modal" id="confirmModal">
+  <div class="confirm-panel">
+    <div class="confirm-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"/>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+      </svg>
+    </div>
+    <h3>Delete this item?</h3>
+    <p>This will permanently remove the file from your gallery. This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============= TOASTS ============= -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ==========================
+// CONFIG
+// ==========================
+const API_BASE = "";
+const LONG_PRESS_DURATION = 600;
+
+const VIDEO_EXTENSIONS = ['mp4', 'webm', 'mov', 'm4v', 'ogg', 'ogv', 'avi', 'mkv'];
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+const VIDEO_MIME = ['video/mp4', 'video/webm', 'video/quicktime', 'video/ogg', 'video/x-m4v'];
+const IMAGE_MIME = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+const ICONS = {
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`,
+  x: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`,
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`,
+  image: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>`,
+  video: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>`,
+  trash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  play: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>`,
+};
+
+function showToast(message, isError = false) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast' + (isError ? ' error' : '');
+  toast.innerHTML = `
+    <span class="toast-icon">${isError ? ICONS.x : ICONS.check}</span>
+    <span>${message}</span>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(4px)';
+    setTimeout(() => toast.remove(), 280);
+  }, 3000);
+}
+
+// ==========================
+// HELPERS
+// ==========================
+function detectMediaType(item) {
+  let url, mime;
+  if (typeof item === 'string') {
+    url = item;
+    mime = '';
+  } else {
+    url = item.url || '';
+    mime = item.type || item.mime || '';
+  }
+
+  if (mime.startsWith('video/')) return 'video';
+  if (mime.startsWith('image/')) return 'image';
+  if (mime) return mime.startsWith('video') ? 'video' : 'image';
+
+  const ext = (url.split('?')[0].split('#')[0].split('.').pop() || '').toLowerCase();
+  if (VIDEO_EXTENSIONS.includes(ext)) return 'video';
+  if (IMAGE_EXTENSIONS.includes(ext)) return 'image';
+  return 'image';
+}
+
+function normalizeMedia(items) {
+  return (items || []).map((item, i) => {
+    if (typeof item === 'string') {
+      return { id: 'm_' + i, url: item, type: detectMediaType(item), name: item.split('/').pop() };
+    }
+    return {
+      id: item.id || 'm_' + i,
+      url: item.url,
+      type: item.type || detectMediaType(item.url),
+      name: item.name || item.url.split('/').pop(),
+      duration: item.duration || null,
+    };
+  });
+}
+
+function formatDuration(seconds) {
+  if (!seconds || isNaN(seconds)) return null;
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// ==========================
+// AUTH
+// ==========================
+async function authenticate() {
+  const password = document.getElementById('passwordInput').value;
+  if (!password) {
+    showToast('Please enter the access key', true);
+    return;
+  }
+  try {
+    const response = await fetch(`${API_BASE}/verify-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await response.json();
+    if (data.success) {
+      document.getElementById('passwordOverlay').classList.add('hide');
+      document.getElementById('appContent').classList.add('visible');
+      loadImages();
+    } else {
+      showToast('Incorrect access key', true);
+    }
+  } catch (err) {
+    showToast('Server error — please try again', true);
+  }
+}
+
+document.getElementById('submitPassword').addEventListener('click', authenticate);
+document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') authenticate();
+});
+
+// ==========================
+// GALLERY
+// ==========================
+let allMedia = [];
+let currentImageIndex = 0;
+let pendingDeleteIndex = null;
+let longPressState = { timer: null, triggered: false, activeIndex: null };
+
+const galleryGrid = document.getElementById('galleryGrid');
+const imgCount = document.getElementById('imgCount');
+const subText = document.getElementById('subText');
+
+async function loadImages() {
+  try {
+    const response = await fetch(`${API_BASE}/api/images`);
+    const data = await response.json();
+    allMedia = normalizeMedia(data.images || data.media || data);
+  } catch (err) {
+    showToast('Failed to load media', true);
+    allMedia = [];
+  }
+  renderGallery();
+}
+
+function renderGallery() {
+  galleryGrid.innerHTML = '';
+  const count = allMedia.length;
+  imgCount.textContent = count.toLocaleString();
+
+  if (count === 0) {
+    subText.textContent = 'Your collection is empty';
+    galleryGrid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">${ICONS.image}</div>
+        <h3>No media yet</h3>
+        <p>Start building your collection by uploading your first photos or videos.</p>
+        <button class="btn btn-primary" onclick="openUploadModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14"/><path d="M5 12h14"/>
+          </svg>
+          Upload media
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  const photos = allMedia.filter(m => m.type === 'image').length;
+  const videos = allMedia.length - photos;
+  const parts = [`${count} item${count === 1 ? '' : 's'}`];
+  if (photos) parts.push(`${photos} photo${photos === 1 ? '' : 's'}`);
+  if (videos) parts.push(`${videos} video${videos === 1 ? '' : 's'}`);
+  subText.textContent = parts.join(' · ');
+
+  allMedia.forEach((item, index) => {
+    const tile = createGalleryTile(item, index);
+    galleryGrid.appendChild(tile);
+  });
+}
+
+function createGalleryTile(item, index) {
+  const tile = document.createElement('div');
+  tile.className = 'gallery-item fade-in';
+  tile.dataset.index = index;
+  tile.style.animationDelay = `${Math.min(index * 15, 200)}ms`;
+
+  // Media element
+  let mediaEl;
+  if (item.type === 'video') {
+    mediaEl = document.createElement('video');
+    mediaEl.className = 'media';
+    mediaEl.src = item.url;
+    mediaEl.muted = true;
+    mediaEl.playsInline = true;
+    mediaEl.preload = 'metadata';
+    mediaEl.setAttribute('webkit-playsinline', 'true');
+  } else {
+    mediaEl = document.createElement('img');
+    mediaEl.className = 'media';
+    mediaEl.src = item.url;
+    mediaEl.loading = 'lazy';
+    mediaEl.alt = item.name || `Item ${index + 1}`;
+  }
+
+  tile.appendChild(mediaEl);
+
+  // Video indicator
+  if (item.type === 'video') {
+    const ind = document.createElement('div');
+    ind.className = 'video-indicator';
+    ind.innerHTML = ICONS.play;
+    tile.appendChild(ind);
+
+    // Try to extract duration
+    if (!item.duration) {
+      const tempVideo = document.createElement('video');
+      tempVideo.preload = 'metadata';
+      tempVideo.src = item.url;
+      tempVideo.addEventListener('loadedmetadata', () => {
+        const formatted = formatDuration(tempVideo.duration);
+        if (formatted) {
+          item.duration = tempVideo.duration;
+          const durEl = tile.querySelector('.video-duration');
+          if (durEl) durEl.textContent = formatted;
+        }
+      });
+    }
+    if (item.duration) {
+      const dur = document.createElement('div');
+      dur.className = 'video-duration mono';
+      dur.textContent = formatDuration(item.duration);
+      tile.appendChild(dur);
+    }
+  }
+
+  // Delete overlay (shown on long press)
+  const overlay = document.createElement('div');
+  overlay.className = 'delete-overlay';
+  overlay.innerHTML = `
+    <button class="delete-btn" data-action="delete">
+      ${ICONS.trash}
+      Delete
+    </button>
+  `;
+  tile.appendChild(overlay);
+
+  // Press progress indicator
+  const progress = document.createElement('div');
+  progress.className = 'press-progress';
+  progress.innerHTML = `
+    <svg viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+      <circle id="pressRing-${index}" cx="20" cy="20" r="18" fill="none" stroke="#ef4444" stroke-width="2"
+        stroke-dasharray="113" stroke-dashoffset="113" transform="rotate(-90 20 20)"
+        style="transition: stroke-dashoffset 0.6s linear"/>
+    </svg>
+  `;
+  tile.appendChild(progress);
+
+  setupPressHandlers(tile, index, mediaEl);
+
+  return tile;
+}
+
+// ==========================
+// LONG PRESS / CLICK HANDLERS
+// ==========================
+function setupPressHandlers(tile, index, mediaEl) {
+  let pressTimer = null;
+  let pressTriggered = false;
+  let isPressing = false;
+  const ring = tile.querySelector('.press-progress circle:last-child');
+
+  const startPress = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    isPressing = true;
+    pressTriggered = false;
+    tile.classList.add('pressing');
+    if (ring) ring.style.strokeDashoffset = '113';
+
+    // Force reflow then animate
+    requestAnimationFrame(() => {
+      if (ring && isPressing) ring.style.strokeDashoffset = '0';
+    });
+
+    pressTimer = setTimeout(() => {
+      if (isPressing) {
+        pressTriggered = true;
+        tile.classList.remove('pressing');
+        tile.classList.add('long-pressing');
+        if (navigator.vibrate) navigator.vibrate(20);
+      }
+    }, LONG_PRESS_DURATION);
+  };
+
+  const endPress = () => {
+    isPressing = false;
+    if (pressTimer) clearTimeout(pressTimer);
+    tile.classList.remove('pressing');
+    setTimeout(() => {
+      tile.classList.remove('long-pressing');
+      pressTriggered = false;
+    }, 50);
+  };
+
+  const cancelPress = () => {
+    isPressing = false;
+    if (pressTimer) clearTimeout(pressTimer);
+    if (ring) ring.style.strokeDashoffset = '113';
+    tile.classList.remove('pressing');
+  };
+
+  // Pointer events handle both mouse + touch
+  tile.addEventListener('pointerdown', startPress);
+  tile.addEventListener('pointerup', endPress);
+  tile.addEventListener('pointerleave', cancelPress);
+  tile.addEventListener('pointercancel', cancelPress);
+  tile.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  // Click — open modal OR confirm delete
+  tile.addEventListener('click', (e) => {
+    if (pressTriggered) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    // If delete button was clicked
+    const deleteBtn = e.target.closest('[data-action="delete"]');
+    if (deleteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      tile.classList.remove('long-pressing');
+      openDeleteConfirm(index);
+      return;
+    }
+    openModal(index);
+  });
+}
+
+// ==========================
+// VIEW TOGGLE (FIXED — CSS classes)
+// ==========================
+document.querySelectorAll('.segmented button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.segmented button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    galleryGrid.classList.toggle('compact', view === 'compact');
+  });
+});
+
+// Refresh
+document.getElementById('btnRefresh').addEventListener('click', () => {
+  showToast('Refreshing gallery');
+  loadImages();
+});
+
+// ==========================
+// LIGHTBOX
+// ==========================
+const imageModal = document.getElementById('imageModal');
+const modalMediaWrap = document.getElementById('modalMediaWrap');
+const modalCurrent = document.getElementById('modalCurrent');
+const modalTotal = document.getElementById('modalTotal');
+const modalType = document.getElementById('modalType');
+
+function openModal(index) {
+  currentImageIndex = index;
+  updateModal();
+  imageModal.classList.add('open');
+}
+
+function closeModal() {
+  imageModal.classList.remove('open');
+  // Clean up media
+  setTimeout(() => {
+    const videos = modalMediaWrap.querySelectorAll('video');
+    videos.forEach(v => { v.pause(); v.src = ''; });
+    modalMediaWrap.innerHTML = '';
+  }, 300);
+}
+
+function nextImage() {
+  if (currentImageIndex < allMedia.length - 1) {
+    currentImageIndex++;
+    updateModal();
+  }
+}
+
+function prevImage() {
+  if (currentImageIndex > 0) {
+    currentImageIndex--;
+    updateModal();
+  }
+}
+
+function updateModal() {
+  const item = allMedia[currentImageIndex];
+  if (!item) return;
+
+  // Pause previous video
+  const prevVideo = modalMediaWrap.querySelector('video');
+  if (prevVideo) prevVideo.pause();
+
+  modalMediaWrap.innerHTML = '';
+
+  let el;
+  if (item.type === 'video') {
+    el = document.createElement('video');
+    el.src = item.url;
+    el.controls = true;
+    el.autoplay = true;
+    el.playsInline = true;
+    el.setAttribute('webkit-playsinline', 'true');
+  } else {
+    el = document.createElement('img');
+    el.src = item.url;
+    el.alt = item.name || '';
+  }
+  modalMediaWrap.appendChild(el);
+
+  modalCurrent.textContent = (currentImageIndex + 1).toString().padStart(2, '0');
+  modalTotal.textContent = allMedia.length.toString().padStart(2, '0');
+  modalType.textContent = item.type === 'video' ? 'VIDEO' : 'IMAGE';
+
+  document.getElementById('modalPrev').style.opacity = currentImageIndex === 0 ? '0.4' : '1';
+  document.getElementById('modalPrev').style.pointerEvents = currentImageIndex === 0 ? 'none' : 'auto';
+  document.getElementById('modalNext').style.opacity = currentImageIndex === allMedia.length - 1 ? '0.4' : '1';
+  document.getElementById('modalNext').style.pointerEvents = currentImageIndex === allMedia.length - 1 ? 'none' : 'auto';
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalPrev').addEventListener('click', prevImage);
+document.getElementById('modalNext').addEventListener('click', nextImage);
+
+imageModal.addEventListener('click', (e) => {
+  if (e.target === imageModal) closeModal();
+});
+
+// Keyboard
+document.addEventListener('keydown', (e) => {
+  if (!imageModal.classList.contains('open')) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'ArrowLeft') prevImage();
+  if (e.key === 'ArrowRight') nextImage();
+});
+
+// Delete from lightbox
+document.getElementById('modalDelete').addEventListener('click', () => {
+  openDeleteConfirm(currentImageIndex);
+});
+
+// ==========================
+// DELETE CONFIRM
+// ==========================
+const confirmModal = document.getElementById('confirmModal');
+const confirmDeleteBtn = document.getElementById('confirmDelete');
+
+function openDeleteConfirm(index) {
+  pendingDeleteIndex = index;
+  confirmModal.classList.add('open');
+}
+
+function closeDeleteConfirm() {
+  confirmModal.classList.remove('open');
+  pendingDeleteIndex = null;
+}
+
+document.getElementById('confirmCancel').addEventListener('click', closeDeleteConfirm);
+confirmModal.addEventListener('click', (e) => {
+  if (e.target === confirmModal) closeDeleteConfirm();
+});
+
+confirmDeleteBtn.addEventListener('click', async () => {
+  if (pendingDeleteIndex === null) return;
+  const index = pendingDeleteIndex;
+  const item = allMedia[index];
+  if (!item) return;
+
+  // Disable button during request
+  confirmDeleteBtn.disabled = true;
+  const originalText = confirmDeleteBtn.innerHTML;
+  confirmDeleteBtn.innerHTML = 'Deleting…';
+
+  try {
+    const response = await fetch(`${API_BASE}/api/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: item.url, id: item.id, type: item.type })
+    });
+
+    const data = await response.json().catch(() => ({ success: true }));
+
+    if (data.success !== false) {
+      showToast('Item deleted');
+      // Close lightbox if open
+      if (imageModal.classList.contains('open')) closeModal();
+      closeDeleteConfirm();
+      // Reload
+      await loadImages();
+    } else {
+      throw new Error(data.error || 'Delete failed');
+    }
+  } catch (err) {
+    showToast('Failed to delete', true);
+    confirmDeleteBtn.disabled = false;
+    confirmDeleteBtn.innerHTML = originalText;
+    return;
+  }
+
+  confirmDeleteBtn.disabled = false;
+  confirmDeleteBtn.innerHTML = originalText;
+});
+
+// ==========================
+// UPLOAD
+// ==========================
+let pendingFiles = [];
+
+function openUploadModal() {
+  pendingFiles = [];
+  document.getElementById('uploadQueue').innerHTML = '';
+  document.getElementById('btnStartUpload').disabled = true;
+  document.getElementById('uploadModal').classList.add('open');
+}
+
+function closeUploadModal() {
+  document.getElementById('uploadModal').classList.remove('open');
+}
+
+document.getElementById('btnOpenUpload').addEventListener('click', openUploadModal);
+document.getElementById('btnCancelUpload').addEventListener('click', closeUploadModal);
+document.getElementById('btnCloseUpload').addEventListener('click', closeUploadModal);
+
+uploadModal.addEventListener('click', (e) => {
+  if (e.target.id === 'uploadModal') closeUploadModal();
+});
+
+function handleFiles(files) {
+  const maxImage = 20 * 1024 * 1024;
+  const maxVideo = 100 * 1024 * 1024;
+
+  Array.from(files).forEach(file => {
+    const type = file.type.startsWith('video/') ? 'video'
+              : file.type.startsWith('image/') ? 'image'
+              : null;
+
+    if (!type) {
+      showToast(`Unsupported file: ${file.name}`, true);
+      return;
+    }
+
+    const maxSize = type === 'video' ? maxVideo : maxImage;
+    if (file.size > maxSize) {
+      showToast(`${file.name} exceeds ${type === 'video' ? '100MB' : '20MB'}`, true);
+      return;
+    }
+
+    pendingFiles.push(file);
+    addToQueue(file, type);
+  });
+
+  document.getElementById('btnStartUpload').disabled = pendingFiles.length === 0;
+  renderQueueHeader();
+}
+
+function renderQueueHeader() {
+  let header = document.querySelector('.queue-section-label');
+  if (pendingFiles.length > 0) {
+    if (!header) {
+      header = document.createElement('div');
+      header.className = 'queue-section-label';
+      document.getElementById('uploadQueue').prepend(header);
+    }
+    header.innerHTML = `<span>Queue</span><span class="count">${pendingFiles.length} ${pendingFiles.length === 1 ? 'item' : 'items'}</span>`;
+  } else {
+    if (header) header.remove();
+  }
+}
+
+function addToQueue(file, type) {
+  const queue = document.getElementById('uploadQueue');
+  const cleanId = 'q_' + Math.random().toString(36).slice(2, 9);
+  file.__queueId = cleanId;
+
+  const item = document.createElement('div');
+  item.className = 'queue-item';
+  item.id = `queue-${cleanId}`;
+  item.innerHTML = `
+    <div class="queue-thumb" id="thumb-${cleanId}"></div>
+    <div class="queue-info">
+      <div class="queue-item-name">${file.name}</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-${cleanId}"></div>
+      </div>
+    </div>
+    <div class="queue-item-status ready" id="status-${cleanId}">
+      <span class="dot"></span>
+      <span>READY</span>
+    </div>
+  `;
+  queue.appendChild(item);
+
+  const thumb = document.getElementById(`thumb-${cleanId}`);
+  if (type === 'video') {
+    const v = document.createElement('video');
+    v.src = URL.createObjectURL(file);
+    v.muted = true;
+    v.playsInline = true;
+    thumb.appendChild(v);
+    const play = document.createElement('div');
+    play.className = 'play-mini';
+    play.innerHTML = ICONS.play;
+    thumb.appendChild(play);
+  } else {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      thumb.innerHTML = `<img src="${e.target.result}" alt="">`;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+async function startUpload() {
+  const uploadBtn = document.getElementById('btnStartUpload');
+  uploadBtn.disabled = true;
+
+  let success = 0;
+
+  for (const file of pendingFiles) {
+    const id = file.__queueId;
+    const status = document.getElementById(`status-${id}`);
+    const statusText = status ? status.querySelector('span:last-child') : null;
+    const progress = document.getElementById(`progress-${id}`);
+
+    if (status) {
+      status.className = 'queue-item-status uploading';
+      if (statusText) statusText.textContent = 'UPLOADING';
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json().catch(() => ({ success: true }));
+
+      if (data.success === false) throw new Error();
+
+      if (progress) progress.style.width = '100%';
+      if (status) {
+        status.className = 'queue-item-status done';
+        if (statusText) statusText.textContent = 'DONE';
+      }
+      success++;
+    } catch (err) {
+      if (status) {
+        status.className = 'queue-item-status error';
+        if (statusText) statusText.textContent = 'FAILED';
+      }
+      showToast(`Failed: ${file.name}`, true);
+    }
+  }
+
+  if (success > 0) {
+    showToast(`${success} ${success === 1 ? 'item' : 'items'} uploaded`);
+    await loadImages();
+  }
+
+  setTimeout(() => {
+    closeUploadModal();
+    uploadBtn.disabled = false;
+    pendingFiles = [];
+  }, 800);
+}
+
+document.getElementById('btnStartUpload').addEventListener('click', startUpload);
+
+// ==========================
+// DROP ZONE
+// ==========================
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', (e) => {
+  handleFiles(e.target.files);
+  e.target.value = '';
+});
+
+// Escape closes modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (confirmModal.classList.contains('open')) closeDeleteConfirm();
+    else if (document.getElementById('uploadModal').classList.contains('open')) closeUploadModal();
+  }
+});
+</script>
+</body>
+</html>

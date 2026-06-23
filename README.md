@@ -1,4 +1,3 @@
-markdown
 <p align="center">
   <img src="https://res.cloudinary.com/dfzrb3fac/image/upload/v1782188114/file_000000001cfc71fabf84b73eaa639faf_cpygth.png" alt="Gallery Logo" width="120" />
 </p>
@@ -18,8 +17,6 @@ markdown
   <a href="#api-reference">API</a> ·
   <a href="#license">License</a>
 </p>
-
----
 
 ## Features
 

@@ -203,6 +203,6 @@ MIT License — feel free to use, modify, and distribute.
 ---
 
 <p align="center">
-  <sub>Crafted with precision. Built for creators.</sub>
+  <sub>Crafted with precision. Built by NgX.</sub>
 </p>
-```
+
